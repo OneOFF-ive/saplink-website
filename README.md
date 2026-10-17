@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://saplink.cloud">🌐 访问官网</a> ·
-  <a href="https://saplink.cloud/download.html?arch=auto">⬇️ 下载 SapLink</a> ·
+  <a href="http://118.89.185.57">🌐 访问官网</a> ·
+  <a href="http://118.89.185.57/download.html?arch=auto">⬇️ 下载 SapLink</a> ·
   <a href="https://github.com/OneOFF-ive/saplink">🔗 产品仓库</a> ·
   <a href="docs/deployment.md">📦 部署说明</a> ·
   <a href="automation/README.md">🔄 自动同步</a>
@@ -26,7 +26,7 @@
 
 这里是 [SapLink](https://github.com/OneOFF-ive/saplink) 的中文产品官网源码，提供产品能力介绍、交互式工作流演示、文档入口和站内安装包下载。
 
-页面采用原生 **HTML、CSS 和 JavaScript**，无需前端框架、构建步骤或生产数据库。生产环境由 **Caddy + Docker** 提供 HTTPS 静态服务，官网地址为 **[saplink.cloud](https://saplink.cloud)**。
+页面采用原生 **HTML、CSS 和 JavaScript**，无需前端框架、构建步骤或生产数据库。生产环境由 **Caddy + Docker** 提供静态服务，同时支持 **[HTTPS 域名](https://saplink.cloud)**、**[HTTP 域名](http://saplink.cloud)** 和 **[HTTP IP](http://118.89.185.57)** 访问。
 
 ## 🧩 官网提供什么
 
@@ -69,7 +69,7 @@ npm run dev
 | `dist/theme.css` | 跟随浏览器主题的浅色配色 |
 | `dist/architecture.js` | Windows 架构识别与下载入口适配 |
 | `server.mjs` | 本地预览服务 |
-| `Caddyfile` | HTTPS、域名跳转、静态服务与下载响应头 |
+| `Caddyfile` | HTTP／HTTPS 并行服务、静态文件与下载响应头 |
 | `automation/` | 安装包同步接收程序、测试与维护说明 |
 | `tests/` | 架构识别与下载流程回归测试 |
 | `docs/` | 部署、证书与版本管理说明 |
@@ -89,7 +89,7 @@ npm run dev
 
 ## 🛡️ HTTPS 与部署
 
-官网使用 HTTPS，HTTP 和 `www.saplink.cloud` 自动跳转到 `https://saplink.cloud`。证书、私钥和安装包目录与网页文件分开管理。
+官网同时提供 HTTP 和 HTTPS，保持访问者选择的协议，HTTP 不强制跳转到 HTTPS，也保留 IP 的 HTTP 入口。证书、私钥和安装包目录与网页文件分开管理。
 
 当前使用手动证书，需要在到期前重新签发并更新；证书位置、有效期、容器挂载、页面切换和回滚步骤见 [部署与版本管理](docs/deployment.md)。
 
@@ -108,6 +108,6 @@ npm run dev
 ---
 
 <p align="center">
-  <a href="https://saplink.cloud">SapLink 官网</a> ·
+  <a href="http://118.89.185.57">SapLink 官网</a> ·
   <a href="https://github.com/OneOFF-ive/saplink">SapLink 产品仓库</a>
 </p>

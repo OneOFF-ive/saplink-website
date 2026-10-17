@@ -4,9 +4,13 @@
 
 `dist/` 内的文件可直接交给静态网站服务器，无需构建、数据库或生产 Node.js 进程。`server.mjs` 仅用于本地预览。
 
-生产环境使用 Docker 中的 Caddy：主机 TCP 80 映射到容器 TCP 8080，主机 TCP 443 映射到容器 TCP 8443，容器名为 `saplink-website`，设置了 `unless-stopped` 自动恢复策略。正式域名为 `https://saplink.cloud`，`www.saplink.cloud` 跳转到主域名。公网 TCP 443 须在腾讯云防火墙或安全组中放行；只有通过公网 HTTPS 验证后才启用 HTTP 强制跳转，避免端口尚未放行时网站无法访问。
+当前同时提供 **http://118.89.185.57**、**http://saplink.cloud** 和 **https://saplink.cloud**，HTTP 不强制跳转到 HTTPS。`www.saplink.cloud` 也分别支持 HTTP 和 HTTPS，并保持访问者选择的协议和域名。
 
-HTTPS 使用用户提供的证书，证书链和私钥保存在 `/srv/saplink-website/certs/fullchain.pem`、`privkey.pem`，以只读目录挂载到容器 `/etc/caddy/certs`。目录权限为 `root:1001 750`，文件为 `root:1001 640`，不得放在网站根目录。Caddy 以 `1000:1001` 运行，只读加载证书，当前手动证书不会自动续期。
+生产环境使用 Docker 中的 Caddy：主机 TCP 80 映射到容器 TCP 8080，主机 TCP 443 映射到容器 TCP 8443，容器名为 `saplink-website`，设置了 `unless-stopped` 自动恢复策略。`auto_https off` 禁用自动 HTTPS 跳转，HTTPS 站点显式加载证书。两个协议共用 `site_content` 配置和同一份页面、安装包目录。当前配置路径为 `/srv/saplink-website/configs/20261017-dual-protocol.Caddyfile`。
+
+此前浏览器可能缓存过 301 永久跳转；服务器无法撤回已缓存的跳转，可清理浏览器缓存、使用无痕窗口或添加新查询参数后访问 HTTP 地址。HTTP 下架构识别受浏览器限制，无法可靠识别时保留手动选择页。
+
+HTTPS 使用用户提供的证书，证书链和私钥保存在 `/srv/saplink-website/certs/fullchain.pem`、`privkey.pem`，启用时以只读目录挂载到容器 `/etc/caddy/certs`。目录权限为 `root:1001 750`，文件为 `root:1001 640`，不得放在网站根目录。Caddy 以 `1000:1001` 运行，手动证书不会自动续期。
 
 当前证书到期时间为 **2027-01-14 23:59:59 UTC**（Asia/Irkutsk 为 2027-01-15 07:59:59）。到期前应重新签发证书，确认域名和私钥匹配，替换上述文件并重启容器，再验证证书链与下载入口。证书文件仅放在被 Git 忽略的 `local/` 和服务器证书目录中。
 

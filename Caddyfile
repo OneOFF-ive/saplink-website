@@ -7,16 +7,7 @@
     }
 }
 
-:8080 {
-    redir https://saplink.cloud{uri} permanent
-}
-
-https://saplink.cloud:8443, https://www.saplink.cloud:8443 {
-    tls /etc/caddy/certs/fullchain.pem /etc/caddy/certs/privkey.pem
-
-    @www host www.saplink.cloud
-    redir @www https://saplink.cloud{uri} permanent
-
+(site_content) {
     root * /srv
     encode zstd gzip
 
@@ -31,4 +22,13 @@ https://saplink.cloud:8443, https://www.saplink.cloud:8443 {
 
     file_server
     log
+}
+
+:8080 {
+    import site_content
+}
+
+https://saplink.cloud:8443, https://www.saplink.cloud:8443 {
+    tls /etc/caddy/certs/fullchain.pem /etc/caddy/certs/privkey.pem
+    import site_content
 }
