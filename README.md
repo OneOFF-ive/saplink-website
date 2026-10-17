@@ -1,29 +1,42 @@
 # SapLink 产品官网
 
-基于 SapLink 仓库产品文档制作的中文官网，以 VS Code 官网的深色背景、蓝色强调和工作界面展示为视觉参考。
+SapLink 中文产品官网，包含产品介绍、工作流演示、文档入口与站内安装包下载。页面采用原生 HTML、CSS 和 JavaScript，生产环境通过 Caddy 提供静态服务。
 
-## 本地预览
+## 开发与检查
 
-运行 `npm run dev`，打开 http://127.0.0.1:4173 。无需安装依赖。
+需要 Node.js，无需安装第三方依赖。
 
-`dist/` 是可直接托管的静态网站目录。`npm run check` 检查交互脚本语法。
+```sh
+npm run dev    # 本地预览：http://127.0.0.1:4173
+npm run check  # JavaScript 语法检查
+npm test       # 下载流程回归测试
+```
 
-## 内容依据
+本地安装包和版本清单可放入 `local/downloads/`，预览服务会将其映射到 `/downloads/`。没有这些文件时仍可预览页面，下载页会显示手动重试提示。所有临时脚本、截图和打包文件统一放在被 Git 忽略的 `local/` 中。
 
-- https://github.com/OneOFF-ive/saplink/blob/main/README.md
-- https://github.com/OneOFF-ive/saplink/blob/main/docs/windows-installer.md
-- https://github.com/OneOFF-ive/saplink/blob/main/docs/mcp-client-guide.md
-- https://github.com/OneOFF-ive/saplink/blob/main/docs/security.md
-- https://github.com/OneOFF-ive/saplink/blob/main/docs/architecture.md
+## 项目结构
 
-核对日期：2026-10-17。架构文档中的“不提供桌面安装包”与专门安装指南及 README 不一致，下载说明采用后两者。演示内容是交互示意，不连接 SAP。下载按钮跳转 GitHub Releases，访客自行选择对应架构安装包。客户端名称说明 MCP 接入场景，不表示认证合作关系。
+| 路径 | 用途 |
+| --- | --- |
+| `dist/` | 可直接部署的页面、样式、交互脚本和品牌标识 |
+| `server.mjs` | 本地预览服务 |
+| `Caddyfile` | 生产环境静态服务、下载响应头与缓存配置 |
+| `automation/` | 安装包同步接收程序、测试与维护说明 |
+| `tests/` | 下载页面回归测试 |
+| `docs/` | 部署与版本管理说明 |
+| `local/` | 不提交到 Git 的本地临时文件 |
 
-## 文件
+`dist/` 同时是网站源码与部署目录，没有额外构建步骤。安装包、版本清单和凭据单独管理，不提交到此仓库。
 
-- `dist/index.html`：页面与文案
-- `dist/styles.css`：响应式样式
-- `dist/app.js`：三个演示场景与移动端导航
-- `dist/logo.svg`：依据仓库三环相扣品牌概念绘制的矢量标识
-- `server.mjs`：本地静态预览服务
+## 部署与维护
 
-网站未收集用户数据，未添加统计、账户或后台。Sites 预览保留默认私有访问权限。
+- [部署说明](docs/deployment.md)：服务器目录、网站更新、安装包布局和下载协议。
+- [自动同步](automation/README.md)：GitHub 发布流程、手动重试、接收端更新和故障处理。
+
+产品仓库负责构建、发布安装包及运行同步工作流；本仓库维护官网和服务器接收端。更新页面与同步安装包是两个独立操作。
+
+服务器只保留最新正式版安装包，完整校验并切换成功后自动清理旧版。历史版本可从产品仓库的 GitHub Releases 下载。
+
+## 内容来源
+
+产品信息依据 [SapLink 产品仓库](https://github.com/OneOFF-ive/saplink)及其文档。工作区画面是交互示意，不连接真实 SAP；安装包同步自官方 GitHub Releases，由官网服务器提供下载。

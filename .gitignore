@@ -1,4 +1,10 @@
 node_modules/
-.sites-local/
+local/
+/dist/downloads/
+AGENTS.md
+__pycache__/
+*.py[cod]
 *.tar.gz
-*.png
+*.zip
+.DS_Store
+Thumbs.db

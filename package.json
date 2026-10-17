@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "node server.mjs", "check": "node --check dist/app.js" }
+  "scripts": {
+    "dev": "node server.mjs",
+    "check": "node --check server.mjs && node --check dist/app.js && node --check dist/download.js",
+    "test": "node --test tests/*.test.mjs"
+  }
 }

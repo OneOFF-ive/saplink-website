@@ -1,0 +1,21 @@
+{
+    admin off
+    auto_https off
+}
+
+:8080 {
+    root * /srv
+    encode zstd gzip
+
+    @latest path /downloads/latest /downloads/latest/* /releases.json
+    header @latest Cache-Control "no-store"
+
+    rewrite /releases.json /downloads/latest/releases.json
+
+    @installers path /downloads/*/*.exe
+    header @installers Content-Disposition "attachment"
+    header X-Content-Type-Options "nosniff"
+
+    file_server
+    log
+}
