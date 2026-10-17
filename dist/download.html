@@ -2,17 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="color-scheme" content="dark light"><meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="description" content="从 SapLink 官网下载 Windows 安装包。下载会自动发起，也可使用手动下载链接。">
   <title>下载 SapLink — 连接 SAP 与 AI</title>
-  <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="download.css">
-  <script src="download.js" defer></script>
+  <link rel="icon" href="app-icon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="download.css?v=20261017-platform">
+  <script src="architecture.js" defer></script><script src="download.js" defer></script>
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body class="download-page">
 <a class="skip" href="#main">跳至主要内容</a>
 <header class="header"><div class="nav-wrap">
-  <a class="brand" href="./" aria-label="SapLink 首页"><img src="logo.svg" width="43" height="27" alt=""><span>SapLink</span></a>
+  <a class="brand" href="./" aria-label="SapLink 首页"><img src="app-icon.png" width="43" height="43" alt=""><span>SapLink</span></a>
   <div class="nav-right"><a class="download-nav-link" href="./#start">安装与使用</a><a class="button secondary small" href="./">返回首页 <span aria-hidden="true">↗</span></a></div>
 </div></header>
 <main id="main" class="download-main container">
@@ -25,6 +26,8 @@
     <p class="installer-filename" id="installer-filename"></p>
     <div class="architecture-options" aria-label="选择安装包架构"><span>选择其他架构</span><a href="download.html?arch=x64" data-arch="x64">Windows x64</a><a href="download.html?arch=arm64" data-arch="arm64">Windows ARM64</a></div>
     <p class="architecture-help">Intel / AMD 电脑选择 x64；Windows ARM 电脑选择 ARM64。</p>
+    <p class="architecture-help">在 Mac 上使用 Windows 虚拟机时，Apple 芯片（M 系列）建议选择 ARM64；Intel 芯片选择 x64</p>
+    <p class="platform-support-note">目前仅支持 Windows 系统，暂不支持 macOS、Linux 和 Android 系统</p>
     <noscript><p class="download-error">浏览器未启用 JavaScript，无法自动下载。请手动下载 <a href="downloads/latest/SapLink-win-x64-setup.exe" download>Windows x64 安装包</a> 或 <a href="downloads/latest/SapLink-win-arm64-setup.exe" download>Windows ARM64 安装包</a>。</p></noscript>
   </section>
   <section class="download-next" aria-labelledby="next-title"><div class="next-heading"><div><div class="eyebrow blue">接下来，开启 SAP + AI</div><h2 id="next-title">安装完成后，从这里开始。</h2></div><a class="text-link" href="./#start">查看完整指引 <span aria-hidden="true">→</span></a></div>

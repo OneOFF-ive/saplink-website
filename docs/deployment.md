@@ -4,7 +4,11 @@
 
 `dist/` 内的文件可直接交给静态网站服务器，无需构建、数据库或生产 Node.js 进程。`server.mjs` 仅用于本地预览。
 
-当前生产环境使用 Docker 中的 Caddy：主机 TCP 80 映射到容器 TCP 8080，容器名为 `saplink-website`，设置了 `unless-stopped` 自动恢复策略。当前使用 HTTP；域名与 HTTPS 需要另行配置。
+生产环境使用 Docker 中的 Caddy：主机 TCP 80 映射到容器 TCP 8080，主机 TCP 443 映射到容器 TCP 8443，容器名为 `saplink-website`，设置了 `unless-stopped` 自动恢复策略。正式域名为 `https://saplink.cloud`，`www.saplink.cloud` 跳转到主域名。公网 TCP 443 须在腾讯云防火墙或安全组中放行；只有通过公网 HTTPS 验证后才启用 HTTP 强制跳转，避免端口尚未放行时网站无法访问。
+
+HTTPS 使用用户提供的证书，证书链和私钥保存在 `/srv/saplink-website/certs/fullchain.pem`、`privkey.pem`，以只读目录挂载到容器 `/etc/caddy/certs`。目录权限为 `root:1001 750`，文件为 `root:1001 640`，不得放在网站根目录。Caddy 以 `1000:1001` 运行，只读加载证书，当前手动证书不会自动续期。
+
+当前证书到期时间为 **2027-01-14 23:59:59 UTC**（Asia/Irkutsk 为 2027-01-15 07:59:59）。到期前应重新签发证书，确认域名和私钥匹配，替换上述文件并重启容器，再验证证书链与下载入口。证书文件仅放在被 Git 忽略的 `local/` 和服务器证书目录中。
 
 `Caddyfile` 将 `/srv` 作为站点根目录，为安装包设置附件下载响应头，并对 `/downloads/latest/` 禁用缓存。旧的 `/releases.json` 地址会映射到最新版本清单。
 
@@ -15,6 +19,7 @@
 ├── releases/<发布时间>/     官网页面版本
 ├── current -> releases/...  当前页面版本标记
 ├── configs/                实际使用的 Caddy 配置
+├── certs/                  HTTPS 证书链和私钥，不对外提供文件服务
 ├── deployment-info.txt     当前容器的部署记录
 └── downloads/
     ├── v<版本号>/          已验证的安装包、稳定名称链接和版本清单

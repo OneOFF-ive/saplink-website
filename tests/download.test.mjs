@@ -20,7 +20,8 @@ function releaseFixture(version = '2.3.4') {
   };
 }
 
-async function openPage(architecture, mode = 'success', version) {
+async function openPage(architecture, mode = 'success', version, detected = null) {
+  const selectedArchitecture = architecture === 'auto' ? detected : architecture;
   const release = releaseFixture(version);
   if (mode === 'external-url') release.platforms[architecture].url = 'https://example.org/installer.exe';
   if (mode === 'wrong-architecture') release.platforms[architecture] = release.platforms[architecture === 'x64' ? 'arm64' : 'x64'];
@@ -37,6 +38,7 @@ async function openPage(architecture, mode = 'success', version) {
   const requests = [];
   const context = vm.createContext({
     URL, URLSearchParams, AbortController, setTimeout, clearTimeout,
+    architectureDetection: Promise.resolve(detected),
     location: { search: '?arch=' + architecture, origin: 'https://example.test' },
     document: { baseURI: 'https://example.test/', getElementById: node, querySelector: node },
     fetch: async (url, options) => {
@@ -55,7 +57,7 @@ async function openPage(architecture, mode = 'success', version) {
       assert.equal(options.method, 'HEAD');
       return {
         ok: mode !== 'missing',
-        headers: { get: () => String(mode === 'wrong-size' ? 1 : release.platforms[architecture].size) },
+        headers: { get: () => String(mode === 'wrong-size' ? 1 : release.platforms[selectedArchitecture].size) },
       };
     },
   });
@@ -80,6 +82,19 @@ for (const architecture of ['x64', 'arm64']) {
     assert.equal(node('installer-version').textContent, 'v7.8.9');
   });
 }
+
+test('auto uses the detected ARM64 installer', async () => {
+  const { node } = await openPage('auto', 'success', undefined, 'arm64');
+  assert.equal(node('manual-download').download, 'SapLink-2.3.4-win-arm64-setup.exe');
+  assert.equal(node('manual-download').clicks, 1);
+});
+
+test('auto without reliable architecture asks for selection without downloading', async () => {
+  const { node, requests } = await openPage('auto');
+  assert.equal(requests.length, 0);
+  assert.equal(node('manual-download').clicks, 0);
+  assert.equal(node('download-title').textContent, '请选择你的安装包');
+});
 
 test('unsupported architecture does not request metadata or start a download', async () => {
   const { node, requests } = await openPage('unsupported');

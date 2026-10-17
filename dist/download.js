@@ -1,9 +1,7 @@
 const title = document.getElementById('download-title');
 const status = document.getElementById('download-status');
 const manual = document.getElementById('manual-download');
-const architecture = new URLSearchParams(location.search).get('arch') || 'x64';
-const validArchitecture = ['x64', 'arm64'].includes(architecture);
-const platformName = architecture === 'arm64' ? 'Windows ARM64' : 'Windows x64';
+let architecture = new URLSearchParams(location.search).get('arch') || 'auto';
 
 function restoreManualDownload() {
   manual.href = new URL(`downloads/latest/SapLink-win-${architecture}-setup.exe`, document.baseURI).href;
@@ -20,12 +18,14 @@ async function request(url, options = {}, read = response => response) {
 
 async function prepareDownload() {
   manual.hidden = true;
-  if (!validArchitecture) {
+  if (architecture === 'auto') architecture = await architectureDetection;
+  if (!['x64', 'arm64'].includes(architecture)) {
     title.textContent = '请选择你的安装包';
-    status.textContent = '暂不支持此架构，请在下方选择 Windows x64 或 ARM64。';
+    status.textContent = '请在下方选择 Windows x64 或 ARM64 安装包。';
     document.getElementById('download-fallback').hidden = true;
     return;
   }
+  const platformName = architecture === 'arm64' ? 'Windows ARM64' : 'Windows x64';
   document.querySelector(`[data-arch="${architecture}"]`).setAttribute('aria-current', 'true');
   document.getElementById('download-fallback').hidden = false;
   title.textContent = '正在准备你的下载';

@@ -1,0 +1,128 @@
+/* Native media queries update immediately when the browser preference changes. */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --panel: #f5f9ff;
+    --border: #d7e2ef;
+    --text: #172b46;
+    --muted: #52657d;
+    --blue: #006fc4;
+    --green: #237343;
+  }
+
+  .header { background: #fffffff2; border-color: var(--border); }
+  .nav-wrap nav, .download-nav-link, .footer-top>div { color: #455971; }
+  .nav-wrap nav a:hover, .footer-top a:hover { color: #006fc4; }
+  .github svg { color: #344b65; }
+  .button.primary { background: #0078d4; border-color: #0078d4; box-shadow: 0 3px 12px #0078d41a; }
+  .button.primary:hover { background: #0066b5; border-color: #0066b5; }
+  .button.secondary { background: #fff; border-color: #bccddd; color: #234361; }
+  .button.secondary:hover { background: #eaf4ff; border-color: #6b9fc9; }
+  a:focus-visible, button:focus-visible { outline-color: #006fc4; }
+  .announcement { background: #edf9ff; color: #455d76; border-color: #d6eaf5; }
+  .announcement a, .text-link, .feature-card>a { color: #006fc4; }
+  .text-link:hover, .feature-card>a:hover { color: #004d8c; }
+  .new-label { color: #0066b5; background: #dceeff; }
+  .hero:before { background: radial-gradient(ellipse at 50% 65%, #d9ecff66, transparent 67%); }
+  .eyebrow, .hero-copy { color: #52657d; }
+  .eyebrow.blue { color: #006fc4; }
+  .hero h1>span { background-image: linear-gradient(110deg, #0078d4 10%, #0867c7 55%, #3d7cdd); }
+  .status-dot { background: #27885a; box-shadow: 0 0 8px #27885a20; }
+  .platform-note, .platform-note a { color: #52657d; }
+  .platform-note a { border-color: #9fb9d1; }
+  .showcase-wrap { background: linear-gradient(135deg, #75b9ff, #1686f7 55%, #3974dc); border-color: #6ba9ed; box-shadow: 0 16px 65px #1c69b521; }
+  .showcase { background: #fff; border-color: #c5d7ec; box-shadow: 0 8px 35px #19498026; }
+  .window-bar { background: #f5f8fc; color: #53657b; border-color: #dce4ee; }
+  .activity-bar { background: #f3f6fa; color: #64758a; border-color: #dce4ee; }
+  .activity-bar .active { color: #006fc4; border-color: #0078d4; }
+  .explorer { background: #f7f9fc; border-color: #dce4ee; }
+  .panel-heading { color: #4d617a; }
+  .connection { border-color: #dce4ee; }
+  .folder { color: #8b6826; }
+  .tree-file.selected { background: #deedff; color: #213f61; }
+  .tree-file>span, .file-tab>span:first-child, .shield-icon { color: #006fc4; }
+  .explorer-bottom, .breadcrumb, .tab-close { color: #65768c; }
+  .editor, .file-tab { background: #fff; }
+  .file-tab { border-right-color: #dce4ee; border-top-color: #0078d4; }
+  .line-number { color: #738195; }
+  .purple { color: #8c369b; }
+  .orange { color: #a24320; }
+  .blue { color: #006fc4; }
+  .green, .code-comment { color: #267345; }
+  .muted, .terminal-tabs, .terminal-muted { color: #62748a; }
+  .terminal, .agent, .agent .panel-heading { border-color: #dce4ee; }
+  .terminal-tabs .chosen { color: #234361; border-color: #0078d4; }
+  .terminal-check, .tool-check { color: #237343; }
+  .terminal-time { color: #006fc4; }
+  .agent { background: #f7faff; }
+  .user-message { background: #eaf3ff; border-color: #cfdef0; color: #234361; }
+  .agent-identity>span { color: #0078d4; }
+  .agent-identity small, .context-badge, .illustration-label { color: #62748a; }
+  .agent-body>p, .agent-result { color: #465d77; }
+  .agent-result b { color: #172b46; }
+  .tool-call { background: #fff; border-color: #d4e0ee; }
+  .tool-call>span:last-child { color: #62748a; }
+  .chat-input { background: #fff; border-color: #b9cbdf; color: #62748a; }
+  .chat-input span { background: #deedff; color: #276193; }
+  .status-bar { background: #e1f0ff; color: #24577f; }
+  .status-divider { color: #7896b2; }
+  .demo-controls button { color: #52657d; }
+  .demo-controls button[aria-selected=true] { background: #e5f2ff; color: #0066b5; border-color: #a8ccef; }
+  .demo-controls button:hover { background: #edf5ff; color: #0066b5; }
+  .compatibility, .workflow, .safety, .docs { border-color: var(--border); }
+  .client-row { color: #344b65; }
+  .client-symbol { color: #886346; }
+  .client-symbol.codex, .client-symbol.cursor { color: #344b65; }
+  .mcp-client, .mcp-client b, .compatibility small { color: #52657d; }
+  .feature-card { background: linear-gradient(135deg, #fff, #f6faff); border-color: var(--border); }
+  .feature-card:hover { border-color: #81b2dc; }
+  .feature-icon { color: #0078d4; background: #edf5ff; border-color: #c7def3; }
+  .mini-code, .mini-flow { background: #f3f7fc; border-color: #dce5f0; }
+  .mini-flow span { background: #fff; border-color: #d0dfef; }
+  .mini-flow i { color: #62748a; }
+  .mini-flow .flow-active { background: #e0efff; color: #0066b5; border-color: #a1c8ed; }
+  .architecture { background: radial-gradient(ellipse at center, #d9ecff80, transparent 70%); }
+  .arch-node { background: #f8fbff; border-color: #cdddeb; }
+  .arch-node small { color: #52657d; }
+  .client-node>span { color: #53789d; }
+  .saplink-node { background: linear-gradient(90deg, #e5f2ff, #f5faff); border-color: #73ade0; }
+  .on-device { background: #d7eaff; color: #0066b5; }
+  .sap-node>b, .arch-line { color: #006fc4; }
+  .arch-line:before { border-color: #81add4; }
+  .arch-line>span { background: #f4f9ff; }
+  .safety-symbol { color: #eff5fc; }
+  .safety-symbol>span { color: #deebf9; }
+  .safety-list>div>span { color: #237343; background: #e4f3e9; }
+  .safety-list p { color: #52657d; }
+  .steps article { border-color: #cdddeb; }
+  .steps article>span { color: #006fc4; }
+  .doc-links>a { background: #f8fbff; border-color: #d7e2ef; }
+  .doc-links>a:hover { background: #eaf4ff; }
+  .doc-links>a>span:first-child, .doc-links>a>span:last-child { color: #006fc4; }
+  .doc-links small { color: #52657d; }
+  .download-section { background: radial-gradient(ellipse at 50% 90%, #cce6ff80, transparent 70%), #f4f9ff; border-color: #d7e2ef; }
+  .download-section small, .footer-top>span, .footer-bottom { color: #52657d; }
+  .footer-bottom { border-color: #d7e2ef; }
+  .skip { color: #fff; }
+
+  /* The same palette also covers the automatic download page. */
+  .download-emblem { background: linear-gradient(145deg, #e3f1ff, #f4f9ff); color: #0078d4; border-color: #b4d4f1; }
+  .installer-summary { color: #52657d; }
+  .installer-platform { background: #e7f3ff; color: #0066b5; border-color: #b7d6f2; }
+  .installer-summary>span+span { border-color: #cdddeb; }
+  .download-fallback a, .download-error a { color: #006fc4; }
+  .installer-filename, .architecture-options>span, .architecture-help { color: #62748a; }
+  .architecture-options>a { color: #455d76; border-color: #bccddd; }
+  .architecture-options>a:hover { color: #0066b5; border-color: #6b9fc9; }
+  .architecture-options>a[aria-current=true] { color: #0066b5; background: #e5f2ff; border-color: #8ebce6; }
+  .download-error { color: #92501b; }
+  .download-next, .download-footer { border-color: #d7e2ef; }
+  .next-steps article { background: #f7faff; border-color: #d7e2ef; }
+  .next-steps article>span { color: #006fc4; }
+  .next-steps p, .download-requirements, .download-footer { color: #52657d; }
+}
+
+@media (prefers-color-scheme: light) and (max-width: 640px) {
+  .nav-wrap nav { background: #fff; border-color: #d7e2ef; }
+}

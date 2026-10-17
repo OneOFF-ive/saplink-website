@@ -1,9 +1,22 @@
 {
     admin off
     auto_https off
+    persist_config off
+    servers {
+        protocols h1 h2
+    }
 }
 
 :8080 {
+    redir https://saplink.cloud{uri} permanent
+}
+
+https://saplink.cloud:8443, https://www.saplink.cloud:8443 {
+    tls /etc/caddy/certs/fullchain.pem /etc/caddy/certs/privkey.pem
+
+    @www host www.saplink.cloud
+    redir @www https://saplink.cloud{uri} permanent
+
     root * /srv
     encode zstd gzip
 
