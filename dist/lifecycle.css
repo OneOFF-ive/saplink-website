@@ -1,0 +1,36 @@
+.lifecycle{--lc-surface:#131c29;--lc-raised:#192638;--lc-line:#2b4058;--lc-label:#9aafc7;--lc-active:#142f4b;--lc-ink:#dceaff;--lc-ok:#8bc49d;border-top:1px solid var(--border)}
+.lifecycle .section-heading{margin-bottom:32px}
+.lifecycle .section-heading h2{line-height:1.5}
+.lifecycle .section-heading>p{max-width:700px;margin-inline:auto}
+.lifecycle-prerequisite{text-align:center;font-size:12px;color:var(--muted);margin:-12px auto 32px}
+.lifecycle-prerequisite a{color:var(--blue);text-decoration:underline;text-underline-offset:4px}
+.lifecycle-layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:24px;align-items:stretch}
+.lifecycle-tabs{display:flex;flex-direction:column;gap:12px}
+.lifecycle-tab{display:flex;align-items:center;gap:16px;text-align:left;background:transparent;border:1px solid var(--lc-line);border-radius:8px;padding:19px 20px;flex:1;transition:background .18s,border-color .18s}
+.lifecycle-tab:hover{background:var(--lc-surface)}
+.lifecycle-tab[aria-selected=true]{background:var(--lc-active);border-color:var(--blue)}
+.lifecycle-number{font:13px Consolas,monospace;color:var(--lc-label);border:1px solid var(--lc-line);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.lifecycle-tab[aria-selected=true] .lifecycle-number{background:#0078d4;border-color:#0078d4;color:white}
+.lifecycle-tab strong{font-size:16px;display:block;font-weight:600}
+.lifecycle-tab small{font-size:11px;display:block;color:var(--lc-label);margin-top:3px;line-height:1.7}
+.lifecycle-tab>span:last-child{margin-left:auto;color:var(--blue)}
+.lifecycle-panel{border:1px solid var(--lc-line);border-radius:10px;background:var(--lc-surface);overflow:hidden;min-width:0}
+.lifecycle-panel-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--lc-line);font-size:11px;color:var(--lc-label)}
+.lifecycle-panel-bar>span:first-child{display:flex;align-items:center;gap:8px}
+.lifecycle-panel-body{padding:26px;min-height:350px}
+.lifecycle-role{color:var(--lc-label);font-size:11px;margin-bottom:9px}
+.lifecycle-prompt{background:var(--lc-raised);border:1px solid var(--lc-line);border-radius:7px;padding:13px 17px;color:var(--lc-ink);font-size:14px;line-height:1.85}
+.lifecycle-agent{font-size:12px;color:var(--blue);font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:7px}
+.lifecycle-agent>span{font-size:19px}
+.lifecycle-results{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.lifecycle-results li{display:flex;align-items:start;gap:10px;font-size:12px;color:var(--lc-ink);line-height:1.8}
+.lifecycle-results li:before{content:'✓';color:var(--lc-ok);flex-shrink:0}
+.lifecycle-outcome{margin-top:22px;padding-top:17px;border-top:1px solid var(--lc-line);display:flex;align-items:start;gap:11px}
+.lifecycle-outcome>span{font-size:10px;color:var(--blue);border:1px solid var(--lc-line);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.lifecycle-outcome p{font-size:12px;line-height:1.9;color:var(--lc-ink)}
+.lifecycle-footer{display:flex;justify-content:space-between;align-items:start;gap:26px;margin-top:23px}
+.lifecycle-footer p{font-size:11px;line-height:1.9;max-width:760px}
+.lifecycle-footer .text-link{white-space:nowrap;margin-top:2px}
+@media(prefers-color-scheme:light){.lifecycle{--lc-surface:#f8fbff;--lc-raised:#eaf3ff;--lc-line:#cddff1;--lc-label:#52657d;--lc-active:#e7f2ff;--lc-ink:#234361;--lc-ok:#237343}}
+@media(max-width:850px){.lifecycle-layout{grid-template-columns:265px minmax(0,1fr);gap:16px}.lifecycle-tab{padding:16px 14px;gap:12px}.lifecycle-tab strong{font-size:14px}.lifecycle-tab small{font-size:10px}.lifecycle-panel-body{padding:21px}.lifecycle-footer{flex-direction:column;gap:13px}}
+@media(max-width:640px){.lifecycle-layout{grid-template-columns:1fr}.lifecycle-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px}.lifecycle-tab{padding:13px 10px;gap:8px}.lifecycle-number{width:26px;height:26px;font-size:11px}.lifecycle-tab strong{font-size:12px}.lifecycle-tab small{font-size:9px}.lifecycle-tab>span:last-child{display:none}.lifecycle-panel-bar{padding:12px 16px;font-size:10px}.lifecycle-panel-body{padding:19px 17px;min-height:350px}.lifecycle-prompt{font-size:13px;padding:12px}.lifecycle-results li,.lifecycle-outcome p{font-size:11px}.lifecycle-prerequisite{font-size:11px;max-width:300px;margin-bottom:24px}.lifecycle .section-heading>p{font-size:12px}.lifecycle-footer p{font-size:10px}}
