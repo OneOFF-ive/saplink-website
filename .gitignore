@@ -1,0 +1,4 @@
+node_modules/
+.sites-local/
+*.tar.gz
+*.png
