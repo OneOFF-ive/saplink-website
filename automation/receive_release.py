@@ -206,6 +206,11 @@ def receive(stream, downloads, get_release, get_latest):
 
 
 def main():
+    # Dispatch bounded uploads; retain the original check/sync/status protocol.
+    if os.environ.get('SSH_ORIGINAL_COMMAND', '').split(' ', 1)[0] in {'prepare', 'chunk', 'promote', 'skill'}:
+        from website_upload_receiver import handle
+        handle(os.environ['SSH_ORIGINAL_COMMAND'], sys.modules[__name__])
+        return
     command = os.environ.get('SSH_ORIGINAL_COMMAND', '')
     if command == 'status':
         manifest = json.loads((DOWNLOADS / 'latest' / 'releases.json').read_text())

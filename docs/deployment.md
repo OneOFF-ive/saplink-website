@@ -27,7 +27,10 @@ HTTPS 使用用户提供的证书，证书链和私钥保存在 `/srv/saplink-we
 ├── deployment-info.txt     当前容器的部署记录
 └── downloads/
     ├── v<版本号>/          已验证的安装包、稳定名称链接和版本清单
-    └── latest -> v.../     最新安装包版本指针
+    ├── latest -> v.../     最新安装包版本指针
+    └── skills/
+        ├── v<版本号>/      对应 Release 源码的 skill ZIP 与 skill.json
+        └── latest -> v.../ 最新 skill 版本指针
 ```
 
 容器只读挂载具体页面版本目录到 `/srv`，挂载下载目录到 `/srv/downloads`，并单独挂载 Caddy 配置。**只修改页面的 `current` 链接不会切换容器内容**；更新页面时必须重建容器，使其挂载新目录。
@@ -91,3 +94,7 @@ v<版本号>/
 - 最新清单和稳定安装包地址返回正常响应，且包含 `Cache-Control: no-store`。
 - 安装包大小与清单一致，手动重试及架构切换可用。
 - 仅保留当前安装包版本目录。旧页面对应的版本化地址在清理后可能失效，重新打开下载页即可获取最新版；需要旧版时前往 GitHub Releases。
+
+## skill 下载同步
+
+正式 Release 发布后，产品仓库工作流自动将对应标签的 saplink-manager skill 打包并同步到 `/downloads/skills/`，固定下载地址为 `/downloads/skills/latest/saplink-manager.zip`，版本及校验信息见同目录的 `skill.json`。它使用独立版本指针，安装包及 COS 同步保持不变。接收器源码、测试及升级步骤见 [自动同步说明](../automation/README.md#skill-zip-与接收器部署)。
