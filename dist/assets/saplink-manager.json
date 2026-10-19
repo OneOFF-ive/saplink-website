@@ -1,0 +1,42 @@
+{
+  "name": "saplink-manager",
+  "snapshot": "91d7bd43e91d",
+  "source": "reviewed project skill snapshot",
+  "repository": "https://github.com/OneOFF-ive/saplink",
+  "base_commit": "331364e9b6fd3361d39e1373fd6a37c05fa0201d",
+  "includes_uncommitted_skill_changes": true,
+  "packaged_at": "2026-10-19T14:14:13.560529+00:00",
+  "filename": "saplink-manager-91d7bd43e91d.zip",
+  "sha256": "91d7bd43e91dff07a94e3727aaa903ed1abc0d5532b42cb5cd2d5bd9c40d3331",
+  "size": 24035,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "4960942f92e86f4fc972e840cf999af83c8b9bb43cff1e45a6b1e22de1825845"
+    },
+    {
+      "path": "agents/openai.yaml",
+      "sha256": "3ce8b4bf88daab71118ae5d64fb80eb36c82ab1fbbab9c98aa4e1b83ad854840"
+    },
+    {
+      "path": "references/client-setup.md",
+      "sha256": "b7278a2100cdf47d9f02308bbee42d86ed390309979c63824753f4bc0b24fb8c"
+    },
+    {
+      "path": "references/installation.md",
+      "sha256": "8fac86d351f757821d6d89fcc8e8182e90f41d2cc4bbf50d95326d38b451ab8b"
+    },
+    {
+      "path": "references/local-management.md",
+      "sha256": "83fb466d660bcf49d9409921c6dc5dd47d5e3c5be22b6f8292d75271113c6490"
+    },
+    {
+      "path": "references/sap-tools.md",
+      "sha256": "ba1e2ebe33e2528bdd8b0836e1306f253e35d3a6a0bfced338743f59b4a07778"
+    },
+    {
+      "path": "references/updates.md",
+      "sha256": "98df273965271b05f0de07f79e44001ae148fce4e9f67e54a3bfe70e1b193457"
+    }
+  ]
+}

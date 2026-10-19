@@ -98,3 +98,15 @@ v<版本号>/
 ## skill 下载同步
 
 正式 Release 发布后，产品仓库工作流自动将对应标签的 saplink-manager skill 打包并同步到 `/downloads/skills/`，固定下载地址为 `/downloads/skills/latest/saplink-manager.zip`，版本及校验信息见同目录的 `skill.json`。它使用独立版本指针，安装包及 COS 同步保持不变。接收器源码、测试及升级步骤见 [自动同步说明](../automation/README.md#skill-zip-与接收器部署)。
+
+## Skill 优先的产品入口与工作台演示
+
+首页主入口和下载页优先推荐完整 saplink-manager 技能包，安装包保留为次级手动入口。直接访问 download.html 不自动下载 EXE；只有明确指定 arch=x64、arch=arm64 或 arch=auto 时才进入原安装包下载流程。技能导入仍由客户端负责，网页不会执行安装；开始指令可复制，剪贴板不可用时会选中文字供手动复制。
+
+AI 生命周期示意包含确认后安装、SAP 连接配置、当前客户端 MCP 接入、SAP 工作和维护更新。安装意愿及路径需要确认，升级先征得同意，卸载仅响应明确要求；SAP 工作前检查并按需启动 MCP。正式演示不访问 SAP、不执行真实安装或卸载。
+
+首页主视觉使用原 SAP 工作台交互演示，保留理解代码、辅助开发、查询数据三个场景切换。生命周期概念图已从首页移除；Skill 优先获取入口和 AI 全生命周期管理介绍继续保留。
+
+本次官网配套技能包使用已审阅的产品项目技能快照，包含首次下载安装与 SAP 访问前检查 MCP 的规则。版本化 ZIP 位于 dist/assets/saplink-manager-<内容哈希>.zip，assets/saplink-manager.json 记录来源基准提交、未提交修改标记、ZIP 和逐文件 SHA-256；不冒充 GitHub 已发布 Release。页面主按钮指向配套包，避免旧 Release 技能包与新页面功能介绍不一致。产品仓库中 skills/saplink-manager/ 更新后，重新导出并发布官网配套包；原 downloads/skills/latest/ Release 同步路径保持原用途。
+
+快速开始区域恢复为手动配置四步：安装 SapLink、添加 SAP 连接、接入 AI 客户端、开始工作，并链接完整安装指南。

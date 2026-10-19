@@ -1,7 +1,7 @@
 const title = document.getElementById('download-title');
 const status = document.getElementById('download-status');
 const manual = document.getElementById('manual-download');
-let architecture = new URLSearchParams(location.search).get('arch') || 'auto';
+let architecture = new URLSearchParams(location.search).get('arch');
 
 function restoreManualDownload() {
   manual.href = new URL(`downloads/latest/SapLink-win-${architecture}-setup.exe`, document.baseURI).href;
@@ -18,6 +18,12 @@ async function request(url, options = {}, read = response => response) {
 
 async function prepareDownload() {
   manual.hidden = true;
+  if (!architecture) {
+    title.textContent = '也可以手动下载安装包';
+    status.textContent = '选择下方的 Windows 架构后，再开始下载安装包。';
+    document.getElementById('download-fallback').hidden = true;
+    return;
+  }
   if (architecture === 'auto') architecture = await architectureDetection;
   if (!['x64', 'arm64'].includes(architecture)) {
     title.textContent = '请选择你的安装包';

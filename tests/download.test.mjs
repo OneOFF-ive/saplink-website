@@ -39,7 +39,7 @@ async function openPage(architecture, mode = 'success', version, detected = null
   const context = vm.createContext({
     URL, URLSearchParams, AbortController, setTimeout, clearTimeout,
     architectureDetection: Promise.resolve(detected),
-    location: { search: '?arch=' + architecture, origin: 'https://example.test' },
+    location: { search: architecture === null ? '' : '?arch=' + architecture, origin: 'https://example.test' },
     document: { baseURI: 'https://example.test/', getElementById: node, querySelector: node },
     fetch: async (url, options) => {
       requests.push(String(url));
@@ -129,4 +129,12 @@ test('manual retry retains the verified installer and updates the status', async
   assert.equal(manual.clicks, 2);
   assert.equal(manual.href, verified);
   assert.equal(node('download-status').textContent, '已重新请求下载，请查看浏览器的下载列表。');
+});
+
+test('skill-first landing does not request or download an installer without an explicit manual choice', async () => {
+  const { node, requests } = await openPage(null);
+  assert.equal(requests.length, 0);
+  assert.equal(node('manual-download').clicks, 0);
+  assert.equal(node('manual-download').hidden, true);
+  assert.equal(node('download-fallback').hidden, true);
 });
