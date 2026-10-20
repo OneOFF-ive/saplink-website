@@ -4,3 +4,7 @@
 
 /* Center each title line independently, including mixed Chinese and Latin text. */
 .skill-start h1{display:block;width:100%;text-align:center;letter-spacing:0}.skill-start h1>span{display:block;text-align:center;text-wrap:balance}
+
+/* Keep the lifecycle and business sections visually connected. */
+.lifecycle{padding-bottom:clamp(24px,3vw,36px)}
+.lifecycle+.features{padding-top:clamp(24px,3vw,36px)}

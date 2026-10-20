@@ -3,138 +3,74 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 
+const catalogSource = readFileSync(new URL('../dist/download-source.js', import.meta.url), 'utf8');
 const original = readFileSync(new URL('../dist/download.js', import.meta.url), 'utf8');
 const script = original.replace(/prepareDownload\(\);\s*$/, 'globalThis.completion = prepareDownload();');
-assert.notEqual(script, original, 'The download page must expose one startup call for the browser harness.');
-
-function releaseFixture(version = '2.3.4') {
-  return {
-    version,
-    platforms: Object.fromEntries(['x64', 'arm64'].map(architecture => {
-      const filename = `SapLink-${version}-win-${architecture}-setup.exe`;
-      return [architecture, {
-        filename, url: `downloads/v${version}/${filename}`,
-        size: architecture === 'x64' ? 100 : 80, sha256: 'a'.repeat(64),
-      }];
-    })),
+assert.notEqual(script, original);
+const origin = 'https://saplink-1302377695.cos.ap-shanghai.myqcloud.com';
+function fixture(version = '2.3.4') {
+  return { schema_version: 1, version,
+    downloads: ['x64','arm64'].map(architecture => ({architecture, url:`${origin}/saplink/v${version}/SapLink-${version}-win-${architecture}-setup.exe`,sha256:'a'.repeat(64)})),
+    skill: {commit:'b'.repeat(40),filename:`SapLink-${version}-skill.zip`,url:`${origin}/saplink/v${version}/SapLink-${version}-skill.zip`,sha256:'b'.repeat(64),size:12345},
   };
 }
-
-async function openPage(architecture, mode = 'success', version, detected = null) {
-  const selectedArchitecture = architecture === 'auto' ? detected : architecture;
-  const release = releaseFixture(version);
-  if (mode === 'external-url') release.platforms[architecture].url = 'https://example.org/installer.exe';
-  if (mode === 'wrong-architecture') release.platforms[architecture] = release.platforms[architecture === 'x64' ? 'arm64' : 'x64'];
+async function openPage(architecture, {version, detected=null, mode='success', mutate, skill=false} = {}) {
+  const catalog=fixture(version); mutate?.(catalog);
   const nodes = new Map();
-  function node(id) {
-    if (!nodes.has(id)) nodes.set(id, {
-      textContent: '', hidden: false, clicks: 0, handlers: {},
-      setAttribute() {},
-      addEventListener(name, handler) { this.handlers[name] = handler; },
-      click() { this.clicks++; this.handlers.click?.(); },
-    });
+  const node = id => {
+    if(!nodes.has(id)) nodes.set(id,{textContent:'',hidden:false,clicks:0,handlers:{},setAttribute(){},removeAttribute(){},addEventListener(name,fn){this.handlers[name]=fn;},click(){this.clicks++;this.handlers.click?.();}});
     return nodes.get(id);
-  }
-  const requests = [];
-  const context = vm.createContext({
-    URL, URLSearchParams, AbortController, setTimeout, clearTimeout,
-    architectureDetection: Promise.resolve(detected),
-    location: { search: architecture === null ? '' : '?arch=' + architecture, origin: 'https://example.test' },
-    document: { baseURI: 'https://example.test/', getElementById: node, querySelector: node },
-    fetch: async (url, options) => {
-      requests.push(String(url));
-      if (mode === 'network-error') throw new Error('Offline');
-      if (String(url) === 'downloads/latest/releases.json') {
-        assert.equal(options.cache, 'no-store');
-        return {
-          ok: mode !== 'metadata-missing',
-          json: async () => {
-            if (mode === 'invalid-json') throw new SyntaxError('Invalid JSON');
-            return structuredClone(release);
-          },
-        };
-      }
-      assert.equal(options.method, 'HEAD');
-      return {
-        ok: mode !== 'missing',
-        headers: { get: () => String(mode === 'wrong-size' ? 1 : release.platforms[selectedArchitecture].size) },
-      };
+  };
+  const skillLink={href:'fallback-skill.zip'};
+  const requests=[];
+  const context=vm.createContext({URL,URLSearchParams,AbortController,setTimeout,clearTimeout,
+    architectureDetection:Promise.resolve(detected),location:{search:architecture===null?'':'?arch='+architecture},
+    document:{getElementById:node,querySelector:node,querySelectorAll:()=>skill?[skillLink]:[]},
+    fetch:async(url,options)=>{
+      requests.push(String(url));assert.ok(['releases.json','skill-releases.json'].includes(url));assert.equal(options.cache,'no-store');
+      if(mode==='network-error')throw new Error('Offline');
+      return {ok:mode!=='metadata-missing',json:async()=>{if(mode==='invalid-json')throw new SyntaxError('Invalid');return String(url)==='skill-releases.json' ? {schema_version:1,version:catalog.version,skill:structuredClone(catalog.skill)} : {schema_version:1,version:catalog.version,downloads:structuredClone(catalog.downloads)};}};
     },
   });
-  vm.runInContext(script, context);
-  await context.completion;
-  return { node, requests, release };
+  vm.runInContext(catalogSource,context);vm.runInContext(script,context);await context.completion;
+  if(skill){try{await vm.runInContext('getCosSkillCatalog()',context);}catch{} await Promise.resolve();}
+  return {node,requests,skillLink,catalog};
 }
-
-for (const architecture of ['x64', 'arm64']) {
-  test(`${architecture}: starts one download matching the selected architecture`, async () => {
-    const { node, release } = await openPage(architecture);
-    const manual = node('manual-download');
-    assert.equal(manual.clicks, 1);
-    assert.equal(manual.download, release.platforms[architecture].filename);
-    assert.equal(manual.href, 'https://example.test/' + release.platforms[architecture].url);
-    assert.equal(node('download-title').textContent, '下载已发起');
+for(const arch of ['x64','arm64']) {
+  test(`${arch}: downloads directly from COS without fetching binary files through the website`,async()=>{
+    const {node,requests,catalog}=await openPage(arch);
+    assert.equal(node('manual-download').href,catalog.downloads.find(d=>d.architecture===arch).url);
+    assert.equal(node('manual-download').clicks,1);assert.equal(node('download-title').textContent,'下载已发起');
+    assert.deepEqual(requests,['releases.json']);
   });
-
-  test(`${architecture}: follows a newer version without page changes`, async () => {
-    const { node } = await openPage(architecture, 'success', '7.8.9');
-    assert.equal(node('manual-download').download, `SapLink-7.8.9-win-${architecture}-setup.exe`);
-    assert.equal(node('installer-version').textContent, 'v7.8.9');
+  test(`${arch}: follows future COS versions`,async()=>{
+    const {node}=await openPage(arch,{version:'7.8.9'});
+    assert.equal(node('manual-download').href,`${origin}/saplink/v7.8.9/SapLink-7.8.9-win-${arch}-setup.exe`);
   });
 }
+test('automatic architecture resolution uses ARM64',async()=>{const {node}=await openPage('auto',{detected:'arm64'});assert.match(node('manual-download').href,/win-arm64-setup.exe$/);assert.equal(node('manual-download').clicks,1);});
+for(const arch of [null,'auto','unsupported'])test(`${arch}: no installer request before architecture selection`,async()=>{const {requests,node}=await openPage(arch);assert.equal(requests.length,0);assert.equal(node('manual-download').clicks,0);});
+for(const mode of ['network-error','metadata-missing','invalid-json'])test(`${mode}: offers GitHub without silently selecting an old installer`,async()=>{const {node}=await openPage('arm64',{mode});assert.equal(node('manual-download').clicks,0);assert.equal(node('manual-download').href,'https://github.com/OneOFF-ive/saplink/releases/latest');assert.match(node('download-status').textContent,/GitHub/);});
+for(const [name,mutate] of [
+  ['foreign installer URL',c=>{c.downloads[0].url='https://example.org/file.exe';}],
+  ['wrong architecture URL',c=>{c.downloads[0].url=c.downloads[1].url;}],
+  ['missing architecture',c=>{c.downloads.pop();}],
+  ['duplicate architecture',c=>{c.downloads.push(c.downloads[0]);}],
+  ['invalid checksum',c=>{c.downloads[0].sha256='invalid';}],
+  ['untrusted version',c=>{c.version='../other';}],
+])test(`${name}: rejects metadata without triggering an automatic download`,async()=>{const {node}=await openPage('x64',{mutate});assert.equal(node('manual-download').clicks,0);assert.equal(node('download-title').textContent,'暂时无法自动下载');});
+test('skill-only page refreshes its COS link without downloading an installer',async()=>{const {node,requests,skillLink,catalog}=await openPage(null,{skill:true,version:'7.8.9'});assert.equal(skillLink.href,catalog.skill.url);assert.equal(node('manual-download').clicks,0);assert.equal(requests.length,1);});
+test('skill metadata uses a separate request from the legacy installer catalog',async()=>{const {requests}=await openPage('x64',{skill:true});assert.deepEqual(requests.sort(),['releases.json','skill-releases.json']);});
+test('manual retry keeps the validated COS link',async()=>{const {node}=await openPage('x64');const link=node('manual-download');const href=link.href;link.click();assert.equal(link.href,href);assert.equal(link.clicks,2);assert.match(node('download-status').textContent,/重新请求/);});
 
-test('auto uses the detected ARM64 installer', async () => {
-  const { node } = await openPage('auto', 'success', undefined, 'arm64');
-  assert.equal(node('manual-download').download, 'SapLink-2.3.4-win-arm64-setup.exe');
-  assert.equal(node('manual-download').clicks, 1);
-});
+test('installer catalog remains usable before a skill has been published',async()=>{const {node}=await openPage('x64',{mutate:c=>{delete c.skill;}});assert.equal(node('manual-download').clicks,1);});
 
-test('auto without reliable architecture asks for selection without downloading', async () => {
-  const { node, requests } = await openPage('auto');
-  assert.equal(requests.length, 0);
-  assert.equal(node('manual-download').clicks, 0);
-  assert.equal(node('download-title').textContent, '请选择你的安装包');
-});
-
-test('unsupported architecture does not request metadata or start a download', async () => {
-  const { node, requests } = await openPage('unsupported');
-  assert.equal(requests.length, 0);
-  assert.equal(node('manual-download').clicks, 0);
-  assert.equal(node('download-fallback').hidden, true);
-});
-
-for (const [architecture, mode] of [
-  ['x64', 'missing'], ['arm64', 'wrong-size'], ['arm64', 'network-error'],
-  ['x64', 'metadata-missing'], ['arm64', 'invalid-json'],
-  ['x64', 'external-url'], ['x64', 'wrong-architecture'],
-]) {
-  test(`${mode}: restores the ${architecture} stable fallback without starting a download`, async () => {
-    const { node } = await openPage(architecture, mode);
-    const manual = node('manual-download');
-    assert.equal(manual.clicks, 0);
-    assert.equal(manual.hidden, false);
-    assert.equal(manual.href, `https://example.test/downloads/latest/SapLink-win-${architecture}-setup.exe`);
-    assert.equal(manual.download, '');
-    assert.equal(node('download-title').textContent, '暂时无法自动下载');
-    assert.equal(node('installer-summary').hidden, true);
-    assert.equal(node('installer-filename').textContent, '');
-  });
-}
-
-test('manual retry retains the verified installer and updates the status', async () => {
-  const { node } = await openPage('arm64');
-  const manual = node('manual-download');
-  const verified = manual.href;
-  manual.click();
-  assert.equal(manual.clicks, 2);
-  assert.equal(manual.href, verified);
-  assert.equal(node('download-status').textContent, '已重新请求下载，请查看浏览器的下载列表。');
-});
-
-test('skill-first landing does not request or download an installer without an explicit manual choice', async () => {
-  const { node, requests } = await openPage(null);
-  assert.equal(requests.length, 0);
-  assert.equal(node('manual-download').clicks, 0);
-  assert.equal(node('manual-download').hidden, true);
-  assert.equal(node('download-fallback').hidden, true);
+for (const [name, mutate] of [
+  ['foreign skill URL', c=>{c.skill.url='https://example.org/skill.zip';}],
+  ['invalid skill size', c=>{c.skill.size=0;}],
+  ['missing skill', c=>{delete c.skill;}],
+]) test(`${name}: cannot block installer downloads`, async()=>{
+  const {node,skillLink}=await openPage('x64',{skill:true,mutate});
+  assert.equal(node('manual-download').clicks,1);
+  assert.equal(skillLink.href,'fallback-skill.zip');
 });

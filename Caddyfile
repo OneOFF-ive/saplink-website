@@ -11,13 +11,40 @@
     root * /srv
     encode zstd gzip
 
-    @latest path /downloads/latest /downloads/latest/* /releases.json
-    header @latest Cache-Control "no-store"
+    @catalog path /releases.json /downloads/latest/releases.json
+    handle @catalog {
+        rewrite * /saplink/latest.json
+        reverse_proxy https://saplink-1302377695.cos.ap-shanghai.myqcloud.com {
+            header_up Host saplink-1302377695.cos.ap-shanghai.myqcloud.com
+            header_up -Authorization
+            header_up -Cookie
+            header_down Cache-Control "no-store"
+        }
+    }
 
-    rewrite /releases.json /downloads/latest/releases.json
+    handle /skill-releases.json {
+        rewrite * /saplink/skill-latest.json
+        reverse_proxy https://saplink-1302377695.cos.ap-shanghai.myqcloud.com {
+            header_up Host saplink-1302377695.cos.ap-shanghai.myqcloud.com
+            header_up -Authorization
+            header_up -Cookie
+            header_down Cache-Control "no-store"
+        }
+    }
 
-    @installers path /downloads/*/*.exe
-    header @installers Content-Disposition "attachment"
+    # Compatibility for previously copied links; binary traffic goes to COS.
+    @oldX64 path /downloads/latest/SapLink-win-x64-setup.exe
+    redir @oldX64 /download.html?arch=x64#manual 302
+    @oldArm64 path /downloads/latest/SapLink-win-arm64-setup.exe
+    redir @oldArm64 /download.html?arch=arm64#manual 302
+
+    @oldSkill path /downloads/skills/latest/saplink-manager.zip /assets/saplink-manager-91d7bd43e91d.zip /assets/saplink-manager-def7ead29194.zip
+    redir @oldSkill /download.html#skill 302
+
+    @retiredDownloads path /downloads/*
+    handle @retiredDownloads {
+        respond "This download endpoint has moved. Open /download.html to get the latest COS download." 410
+    }
     header X-Content-Type-Options "nosniff"
 
     file_server

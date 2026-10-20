@@ -60,7 +60,7 @@ npm run dev
 | `npm run check` | 检查服务端与页面脚本语法 |
 | `npm test` | 验证架构识别、自动下载和错误恢复流程 |
 
-本地安装包和版本清单可放入 `local/downloads/`，预览服务会将其映射到 `/downloads/`。没有这些文件时仍可浏览页面，下载页会显示手动重试提示。
+本地预览从 COS 获取最新版本清单，安装包和技能包直接由浏览器从 COS 下载，无须在本地放置二进制文件。
 
 ## 🗂️ 项目结构
 
@@ -69,9 +69,10 @@ npm run dev
 | `dist/` | 可直接部署的页面、样式、交互脚本和品牌标识 |
 | `dist/theme.css` | 跟随浏览器主题的浅色配色 |
 | `dist/architecture.js` | Windows 架构识别与下载入口适配 |
+| `dist/download-source.js` | COS 版本清单校验与技能包链接更新 |
 | `server.mjs` | 本地预览服务 |
 | `Caddyfile` | HTTP／HTTPS 并行服务、静态文件与下载响应头 |
-| `automation/` | 安装包同步接收程序、测试与维护说明 |
+| `automation/` | COS 发布入口与操作说明 |
 | `tests/` | 架构识别与下载流程回归测试 |
 | `docs/` | 部署、证书与版本管理说明 |
 | `local/` | 不提交到 Git 的临时脚本、截图、证书及本地安装包 |
@@ -81,12 +82,12 @@ npm run dev
 ## 🔄 从 GitHub 发布到官网下载安装包
 
 ```text
-产品仓库发布正式版 → 同步并校验 x64／ARM64 安装包 → 切换最新版本 → 官网提供下载
+产品仓库发布正式版 → 校验安装包并打包 Skill → 上传 COS 并切换版本清单 → 官网直接下载 COS 文件
 ```
 
-产品仓库负责构建、发布安装包及运行同步工作流；本仓库维护官网和服务器接收端。**网页发布与安装包同步是两个独立操作**，安装包更新无需重新发布页面。
+产品仓库负责构建、发布安装包与技能包，并通过 Sync COS downloads 工作流同步到 COS；本仓库维护静态官网和版本清单代理。**网页发布与 COS 发布是两个独立操作**，文件更新无需推送到官网服务器。
 
-服务器只保留最新正式版安装包，完整校验并切换成功后自动清理旧版。历史版本和变更说明可在 [GitHub Releases](https://github.com/OneOFF-ive/saplink/releases) 查看。
+官网服务器不再接收或提供安装包与技能包，浏览器读取最新清单后直接从 COS 下载；旧服务器推送工作流已停用。历史版本和变更说明可在 [GitHub Releases](https://github.com/OneOFF-ive/saplink/releases) 查看。
 
 ## 🛡️ HTTPS 与部署
 

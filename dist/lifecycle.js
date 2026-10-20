@@ -4,7 +4,7 @@
   const stages = [
     {
       prompt: '帮我安装 SapLink，然后连接我的 SAP 开发系统。',
-      results: ['检查本机是否已安装；未安装时先询问安装意愿和路径，默认目录为用户目录下的 AppData\\Local\\Programs\\SapLink', '依次尝试官网、COS、GitHub，选择匹配架构的正式版安装包并校验后安装', '验证安装结果，再继续配置；安装失败时说明状态并提示手动处理'],
+      results: ['检查本机是否已安装；未安装时先询问安装意愿和路径，默认目录为用户目录下的 AppData\\Local\\Programs\\SapLink', '依次尝试COS、GitHub，选择匹配架构的正式版安装包并校验后安装', '验证安装结果，再继续配置；安装失败时说明状态并提示手动处理'],
       outcome: '先导入 Skill，再由 Agent 帮你从未安装走到可用的本机应用',
     },
     {

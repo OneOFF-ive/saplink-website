@@ -1,102 +1,23 @@
-# GitHub 发布后自动同步安装包与 skill
+# COS 发布说明
 
-产品仓库负责 Actions 下载与上传，本目录负责服务器接收和版本切换。工作流源码以产品仓库为准：
+官网的安装包和技能包现已统一由腾讯云 COS 分发，不再推送到官网服务器。
 
-- [sync-website-downloads.yml](https://github.com/OneOFF-ive/saplink/blob/main/.github/workflows/sync-website-downloads.yml)
-- [prepare-website-release.py](https://github.com/OneOFF-ive/saplink/blob/main/.github/scripts/prepare-website-release.py)
+## 当前自动发布
 
-工作流在正式 Release 发布后同步两种 Windows 安装包，并从该 Release 标签对应的源码自动打包和同步 saplink-manager skill ZIP。skill 不同步到 COS，原 COS 安装包与版本信息同步保持不变。也支持手动运行，未指定标签时处理最新正式版。它只接受 `vMAJOR.MINOR.PATCH` 格式的正式版本，跳过预发布和已被新版替代的事件。
+维护入口在产品仓库：
 
-## 发布与重试
+- [Sync COS downloads 工作流](https://github.com/OneOFF-ive/saplink/blob/main/.github/workflows/sync-cos-downloads.yml)
+- [COS 发布脚本](https://github.com/OneOFF-ive/saplink/blob/main/.github/scripts/sync-cos-release.py)
+- [运行记录与手动重试](https://github.com/OneOFF-ive/saplink/actions/workflows/sync-cos-downloads.yml)
 
-先上传以下两种安装包，再发布正式 Release：
+发布正式版时，工作流校验两种 Windows 安装包，打包该 Release 对应源码的 `saplink-manager/`，上传并验证公开 COS 文件，再切换 `saplink/latest.json`。预发布和过期事件不会覆盖最新正式版。
 
-```text
-SapLink-<版本号>-win-x64-setup.exe
-SapLink-<版本号>-win-arm64-setup.exe
-```
+需要重试时在 Actions 运行 `Sync COS downloads`；`release_tag` 留空处理最新正式版。使用现有仓库 Secrets `COS_SECRET_ID` 和 `COS_SECRET_KEY`，官网服务器和前端均不需要这些凭据。
 
-两者都需要 GitHub 提供文件大小和 SHA-256 元数据；单个文件不得超过 256 MiB。若先发布再补传文件，工作流会等待约三分钟，超时后需要手动重试。
+官网仅通过 Caddy 转发公开版本清单，浏览器从 COS 直接下载安装包和技能包。部署路径、兼容链接和备用版本见 [部署文档](../docs/deployment.md)。
 
-在 [Actions → Sync website downloads](https://github.com/OneOFF-ive/saplink/actions/workflows/sync-website-downloads.yml) 点击 **Run workflow**；`release_tag` 留空表示最新正式版，也可填写对应的 `v<版本号>`。旧版或预发布不会覆盖当前官网版本。
+## 官网同步退役
 
-## 同步流程
+旧官网 SSH 上传工作流、接收器及其测试已从两个项目源码移除。官网不再接收安装包或技能 ZIP；服务器历史文件和回滚备份保留，此次源码清理不删除它们。
 
-1. Actions 等待 x64、ARM64 安装包及其官方 SHA-256 均可用。
-2. 下载并核对大小与 SHA-256，通过 SSH 的 prepare / chunk / promote 协议分块续传。
-3. 服务器再次向 GitHub 核对正式发布记录，并校验全部文件。
-4. 完整版本准备好后，原子替换 `downloads/latest`，再次核对当前安装包，再删除旧版安装包目录及遗留上传临时目录。服务器只保留最新版；历史版本从 GitHub Releases 下载。
-5. 从 Release 标签的 skills/saplink-manager/ 生成可复现 ZIP，经独立的 skill 命令上传；服务器向 GitHub 读取该标签源码重建并核验，原子切换 skills/latest。
-6. Actions 检查公网安装包版本、下载地址，以及 skill ZIP 的大小和 SHA-256。
-
-重试时服务器先核对已有文件；若两种安装包均与官方 SHA-256 一致，则只传输版本清单，不重复上传安装包。不允许自动降级。上传过程中出现更新的正式版时，旧任务拒绝切换，由新版本的任务继续同步。
-
-## 服务器
-
-- 专用账户：`saplinksync`，无 sudo 或 Docker 权限。
-- 仅接受 `check`、`sync`、`status`、`prepare`、`chunk`、`promote` 和 `skill <version>` 这些受限 SSH 命令，禁止终端、端口转发、代理转发及密码登录。
-- 接收程序：`/usr/local/lib/saplink-release-sync/receive_release.py`，由 root 管理。
-- 下载目录：`/srv/saplink-website/downloads`。
-- 专用密钥保存在产品仓库的 Actions Secret `SAPLINK_WEBSITE_SYNC_KEY` 中。个人登录密钥不参与同步。
-- 工作流固定校验服务器 SSH 主机公钥；服务器换机或重装更换主机密钥时需要同步更新。
-
-`receive_release.py` 是接收端源代码，`test_receive_release.py` 覆盖完整发布、幂等重试、缺包、篡改、路径穿越、过期任务与降级保护。测试需在 Linux / Python 3.11+ 运行：
-
-```sh
-RECEIVER_MODULE="$PWD/automation/receive_release.py" python3 -m unittest discover -s automation -p "test_*.py" -v
-```
-
-## 在未来的自动构建发布流程中调用
-
-GitHub Actions 使用 `GITHUB_TOKEN` 创建的 Release 不会触发另一个 `release` 工作流。在构建流程中，等两种安装包全部上传并发布完成后，追加一个依赖发布任务的 job：
-
-```yaml
-sync_website:
-  needs: publish
-  uses: ./.github/workflows/sync-website-downloads.yml
-  with:
-    release_tag: ${{ github.ref_name }}
-  secrets: inherit
-```
-
-其中 `publish` 必须替换为实际发布 job 的 ID。只有在工作流由版本标签触发时，`github.ref_name` 才是所需标签；其他触发方式需传入发布 job 的实际版本标签输出。
-
-直接在 GitHub 发布正式 Release 时，由 `release: published` 触发，无需额外调用。
-
-## 运维与失败处理
-
-| 现象 | 处理方式 |
-| --- | --- |
-| 缺少某架构或官方 SHA-256 | 等待两个附件上传完成后重试 |
-| 大小或 SHA-256 不匹配 | 核对官方附件；同版本已有文件发生变化时需管理员检查 |
-| SSH 认证或主机密钥校验失败 | 检查专用 Secret、服务器账户和固定主机公钥 |
-| 网络超时 | 重试任务；已验证的安装包会免传 |
-| 版本过期或降级被拒绝 | 同步最新正式版，不以自动同步进行回退 |
-
-下载或校验失败时不切换版本，也不清理现有安装包。若切换成功但旧包清理失败，新版仍保持可下载，任务会报告清理失败；重试即可继续清理。接收进程处理取消信号并设置 18 分钟上限，避免异常连接无限期占用同步锁；工作流总时限为 90 分钟；分块上传命令有独立时限，中断后复核并复用已完成的块。
-
-清理在同步锁内执行，只删除下载目录下符合版本命名规则的真实子目录和遗留上传临时目录，不跟随目录软链接，也不删除当前版本或未知目录。
-
-更新接收端时，由管理员将本目录的程序安装到 `/usr/local/lib/saplink-release-sync/`，保持 root 所有权，并在 Linux 上运行回归测试。单独更新接收程序不需要重启网站容器。网站目录、挂载和下载协议见[部署说明](../docs/deployment.md)。
-
-专用同步账户不能修改自身程序。撤销同步访问时可删除仓库 Secret 并禁用服务器专用账户的公钥。轮换专用密钥时需同时更新服务器公钥与仓库 Secret；不得将私钥或 GitHub 登录令牌写入仓库。
-
-## skill ZIP 与接收器部署
-
-相关源码：`website_upload_receiver.py` 提供受限续传和 skill 命令，`website_skill.py` 实现源码校验、可复现打包和独立的 skill 发布。`receive_release.py` 将扩展命令分派给这两个模块；原安装包校验与切换逻辑保持不变。产品仓库负责 Actions 和上传客户端，本仓库保存服务器端完整源码。
-
-skill ZIP 包含顶层 `saplink-manager/` 和其中的 `SKILL.md`、`agents/`、`references/`。无须手工上传 ZIP 到 GitHub Release。
-
-- 最新下载：`/downloads/skills/latest/saplink-manager.zip`。
-- 元数据：`/downloads/skills/latest/skill.json`，包含 version、commit、filename、url、size、sha256。
-- 版本归档：`/downloads/skills/v<version>/SapLink-<version>-skill.zip`。
-
-skill 与安装包分别同步；skill 失败时任务标红，但不回滚已成功同步的安装包，重跑即可补齐。旧 skill 位于独立子目录，不参与安装包旧版本清理。测试数据放在本地 `local/tests/`，不提交。
-
-已有接收器的服务器可将 `install-website-upload.py`、`website_upload_receiver.py`、`website_skill.py` 放在同一临时目录，执行：
-
-```sh
-sudo python3 /path/to/install-website-upload.py
-```
-
-安装脚本要求已有正式接收器，先验证语法，在 `/var/backups/saplink-release-sync/` 备份，再安装扩展并更新受限命令入口。不会修改账户、密钥、COS、官网页面或容器，无需重启官网。首次部署完整接收器时应同时安装本目录三个运行时模块（receive_release.py、website_upload_receiver.py、website_skill.py），保持 root 所有权和 0644 权限。
+维护发布功能时只修改产品仓库的 COS 工作流与脚本，不重新启用旧官网上传。

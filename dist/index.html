@@ -5,9 +5,9 @@
   <meta name="color-scheme" content="dark light"><meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="description" content="SapLink 是面向 AI Agent 的本地 SAP 系统连接应用。通过 MCP，在熟悉的 AI 工作环境中理解 SAP 系统上下文、辅助开发并查询业务数据。">
   <title>SapLink — 连接 SAP 与 AI，探索无限可能</title>
-  <link rel="icon" href="app-icon.png" type="image/png"><link rel="stylesheet" href="styles.css?v=20261019-spacing"><script src="app.js" defer></script><script src="architecture.js" defer></script>
+  <link rel="icon" href="app-icon.png" type="image/png"><link rel="stylesheet" href="styles.css?v=20261019-spacing"><script src="app.js" defer></script><script src="architecture.js" defer></script><script src="download-source.js?v=20261020-split-catalogs" defer></script>
   <link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="lifecycle.css?v=20261019-agent"><script src="lifecycle.js?v=20261019-agent" defer></script>
-  <link rel="stylesheet" href="skill-first.css?v=20261019-agent">
+  <link rel="stylesheet" href="skill-first.css?v=20261020-spacing">
 </head>
 <body>
 <a class="skip" href="#main">跳至主要内容</a>
@@ -38,7 +38,7 @@
 <section class="compatibility container"><p>你的 AI 工作环境，现在拥有 SAP 上下文。</p><div class="client-row"><span><b class="client-symbol">✳</b> Claude</span><span><b class="client-symbol codex">◉</b> Codex</span><span><b class="client-symbol cursor">◈</b> Cursor</span><span><b class="client-symbol vscode">⋈</b> VS Code</span><span class="mcp-client"><b>⌁</b> MCP 客户端</span></div><small>客户端需支持 Streamable HTTP 与 Bearer 认证，具体接入方式见客户端文档。</small></section>
 <section id="ai-management" class="lifecycle container section" aria-labelledby="lifecycle-title">
   <div class="section-heading"><div class="eyebrow blue">AI 全生命周期管理</div><h2 id="lifecycle-title">不只帮你使用 SAP<br>也帮你管理 SapLink</h2><p>从下载安装、连接配置，到 SAP 工作、更新维护，一套 Skill 把操作衔接起来</p></div>
-  <p class="lifecycle-prerequisite">先导入 <a href="assets/saplink-manager-91d7bd43e91d.zip" download="saplink-manager.zip">saplink-manager 技能包</a>，再把需求告诉 Agent；不需要预先安装 SapLink。<a href="download.html#skill">查看使用方法 →</a></p>
+  <p class="lifecycle-prerequisite">先导入 <a data-cos-skill href="https://saplink-1302377695.cos.ap-shanghai.myqcloud.com/saplink/v1.0.4/SapLink-1.0.4-skill.zip" download="SapLink-1.0.4-skill.zip">saplink-manager 技能包</a>，再把需求告诉 Agent；不需要预先安装 SapLink。<a href="download.html#skill">查看使用方法 →</a></p>
   <div class="lifecycle-layout">
     <div class="lifecycle-tabs" role="tablist" aria-label="AI 管理步骤">
       <button class="lifecycle-tab" id="lifecycle-install" role="tab" aria-selected="true" aria-controls="lifecycle-panel"><span class="lifecycle-number">01</span><span><strong>确认后下载安装</strong><small>检查安装，确认目录，校验安装包</small></span><span aria-hidden="true">↗</span></button>
@@ -52,7 +52,7 @@
       <div class="lifecycle-panel-body">
         <div class="lifecycle-role">你只需说</div><p class="lifecycle-prompt" data-lifecycle-prompt>帮我安装 SapLink，然后连接我的 SAP 开发系统。</p>
         <div class="lifecycle-agent"><span aria-hidden="true">✧</span> AI 协同流程</div>
-        <ul class="lifecycle-results"><li data-lifecycle-result>检查本机安装情况，先确认安装意愿及默认或自定义安装目录</li><li data-lifecycle-result>依次尝试官网、COS、GitHub，匹配架构并校验安装包后安装</li><li data-lifecycle-result>验证安装结果，再继续配置；失败时说明状态并提示手动处理</li></ul>
+        <ul class="lifecycle-results"><li data-lifecycle-result>检查本机安装情况，先确认安装意愿及默认或自定义安装目录</li><li data-lifecycle-result>优先 COS，备用 GitHub，匹配架构并校验安装包后安装</li><li data-lifecycle-result>验证安装结果，再继续配置；失败时说明状态并提示手动处理</li></ul>
         <div class="lifecycle-outcome"><span>带来什么</span><p data-lifecycle-outcome>先导入 Skill，再由 Agent 帮你从未安装走到可用的本机应用</p></div>
       </div>
     </div>
